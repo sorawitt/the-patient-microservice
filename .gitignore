@@ -1,0 +1,15 @@
+.DS_Store
+.env
+.env.*
+
+# IDEs/editors
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+
+# Build outputs
+**/target/
+**/build/
+.gradle/
