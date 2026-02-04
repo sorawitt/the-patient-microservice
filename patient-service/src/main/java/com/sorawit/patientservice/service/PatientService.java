@@ -4,6 +4,7 @@ import com.sorawit.patientservice.dto.PatientRequestDTO;
 import com.sorawit.patientservice.dto.PatientResponseDTO;
 import com.sorawit.patientservice.exception.EmailAlreadyExistsException;
 import com.sorawit.patientservice.exception.PatientNotFoundException;
+import com.sorawit.patientservice.grpc.BillingServiceGrpcClient;
 import com.sorawit.patientservice.mapper.PatientMapper;
 import com.sorawit.patientservice.model.Patient;
 import com.sorawit.patientservice.repository.PatientRepository;
@@ -18,10 +19,12 @@ import java.util.UUID;
 public class PatientService {
     private final PatientRepository patientRepository;
     private final PatientMapper patientMapper;
+    private final BillingServiceGrpcClient billingServiceGrpcClient;
 
-    public PatientService(PatientRepository patientRepository, PatientMapper patientMapper) {
+    public PatientService(PatientRepository patientRepository, PatientMapper patientMapper, BillingServiceGrpcClient billingServiceGrpcClient) {
         this.patientRepository = patientRepository;
         this.patientMapper = patientMapper;
+        this.billingServiceGrpcClient = billingServiceGrpcClient;
     }
 
     public List<PatientResponseDTO> getPatients() {
@@ -35,6 +38,8 @@ public class PatientService {
         }
         Patient newPatient = patientMapper.toPatient(patientRequestDTO);
         patientRepository.save(newPatient);
+
+        billingServiceGrpcClient.createBilling(newPatient.getId().toString(), newPatient.getName(), newPatient.getEmail());
 
         return patientMapper.toPatient(newPatient);
     }
